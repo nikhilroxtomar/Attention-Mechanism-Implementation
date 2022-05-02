@@ -1,7 +1,7 @@
 
 import tensorflow as tf
 from tensorflow.keras.layers import GlobalAveragePooling2D, GlobalMaxPooling2D, Reshape, Dense, Input
-from tensorflow.keras.layers import Activation, Concatenate, Conv2D
+from tensorflow.keras.layers import Activation, Concatenate, Conv2D, Multiply
 
 """
 Implementation of CBAM: Convolutional Block Attention Module in the TensorFlow 2.5.
@@ -28,6 +28,7 @@ def channel_attention_module(x, ratio=8):
     ## Add both the features and pass through sigmoid
     feats = x1 + x2
     feats = Activation("sigmoid")(feats)
+    feats = Multiply()([x, feats])
 
     return feats
 
@@ -44,12 +45,13 @@ def spatial_attention_module(x):
     feats = Concatenate()([x1, x2])
     ## Conv layer
     feats = Conv2D(1, kernel_size=7, padding="same", activation="sigmoid")(feats)
+    feats = Multiply()([x, feats])
 
     return feats
 
 def cbam(x):
-    x = x * channel_attention_module(x)
-    x = x * spatial_attention_module(x)
+    x = channel_attention_module(x)
+    x = spatial_attention_module(x)
     return x
 
 if __name__ == "__main__":
