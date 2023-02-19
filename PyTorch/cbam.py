@@ -23,7 +23,7 @@ class channel_attention_module(nn.Module):
         x2 = self.max_pool(x).squeeze(-1).squeeze(-1)
         x2 = self.mlp(x2)
 
-        feats = x1 + x1
+        feats = x1 + x2
         feats = self.sigmoid(feats).unsqueeze(-1).unsqueeze(-1)
         refined_feats = x * feats
 
